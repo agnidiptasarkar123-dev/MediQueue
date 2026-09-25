@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <!-- Brand Icon -->
+  <rect x="5" y="10" width="40" height="40" rx="12" fill="#2563eb" />
+  <path d="M25 15v30M10 30h30" stroke="#ffffff" stroke-width="4" stroke-linecap="round" />
+  <circle cx="25" cy="30" r="14" stroke="#ffffff" stroke-width="3" fill="none" />
+  
+  <!-- Brand Text -->
+  <text x="55" y="40" font-family="'Inter', -apple-system, sans-serif" font-weight="800" font-size="32" fill="#0f172a" letter-spacing="-0.5">MediQueue</text>
+</svg>

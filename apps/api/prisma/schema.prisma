@@ -1,0 +1,311 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  PATIENT
+  STAFF
+  ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum PriorityType {
+  REGULAR
+  ELDERLY
+  PREGNANCY
+  EMERGENCY
+}
+
+enum AppointmentStatus {
+  BOOKED
+  WAITING
+  CALLED
+  IN_CONSULTATION
+  COMPLETED
+  SKIPPED
+  NO_SHOW
+  CANCELLED
+}
+
+enum QueueEntryStatus {
+  WAITING
+  CALLED
+  IN_CONSULTATION
+  COMPLETED
+  SKIPPED
+  NO_SHOW
+}
+
+enum NotificationType {
+  THREE_TURNS_AWAY
+  YOUR_TURN
+  CONSULTATION_COMPLETE
+  APPOINTMENT_REMINDER
+  GENERAL
+}
+
+enum AuditAction {
+  USER_LOGIN
+  USER_LOGOUT
+  OTP_SENT
+  OTP_VERIFIED
+  APPOINTMENT_BOOKED
+  QUEUE_JOINED
+  PATIENT_CALLED
+  PATIENT_SKIPPED
+  PATIENT_NO_SHOW
+  CONSULTATION_STARTED
+  CONSULTATION_COMPLETED
+  PRIORITY_CHANGED
+  DOCTOR_CREATED
+  DEPARTMENT_CREATED
+  DOCTOR_UPDATED
+  DEPARTMENT_UPDATED
+}
+
+// ─── Core User Model ─────────────────────────────────────────────────────────
+
+model User {
+  id          String   @id @default(cuid())
+  phone       String   @unique
+  name        String?
+  role        UserRole @default(PATIENT)
+  isVerified  Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  lastSentAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  patient          Patient?
+  staffProfile     StaffProfile?
+  otpVerifications OtpVerification[]
+  notifications    Notification[]
+  auditLogs        AuditLog[]
+
+  @@index([phone])
+}
+
+// ─── Patient Profile ──────────────────────────────────────────────────────────
+
+model Patient {
+  id              String       @id @default(cuid())
+  userId          String       @unique
+  fullName        String       @default("Patient")
+  dateOfBirth     DateTime?
+  gender          Gender?
+  priorityStatus  PriorityType @default(REGULAR)
+  consentGiven    Boolean      @default(false)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+
+  @@index([userId])
+}
+
+// ─── Staff / Doctor Profile ───────────────────────────────────────────────────
+
+model StaffProfile {
+  id                   String  @id @default(cuid())
+  userId               String  @unique
+  fullName             String
+  departmentId         String?
+  specialization       String?
+  roomNumber           String?
+  isActive             Boolean @default(true)
+  avgServiceMinutes    Float   @default(6.0)
+  isDoctor             Boolean @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department  Department? @relation(fields: [departmentId], references: [id])
+  queues      QueueEntry[]
+
+  @@index([userId])
+  @@index([departmentId])
+}
+
+// ─── Department ───────────────────────────────────────────────────────────────
+
+model Department {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  code        String  @unique // e.g., "C" for Cardiology
+  description String?
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  staff       StaffProfile[]
+  appointments Appointment[]
+  queueEntries QueueEntry[]
+
+  @@index([code])
+}
+
+// ─── Appointment ──────────────────────────────────────────────────────────────
+
+model Appointment {
+  id              String            @id @default(cuid())
+  patientId       String
+  staffProfileId  String?           // the doctor/staff handling
+  departmentId    String
+  appointmentDate DateTime
+  slotStart       DateTime?
+  slotEnd         DateTime?
+  status          AppointmentStatus @default(BOOKED)
+  isWalkIn        Boolean           @default(false)
+  notes           String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  patient      Patient       @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  department   Department    @relation(fields: [departmentId], references: [id])
+  queueEntry   QueueEntry?
+  notifications Notification[]
+
+  @@index([patientId])
+  @@index([departmentId])
+  @@index([staffProfileId])
+  @@index([appointmentDate])
+}
+
+// ─── Queue Entry ──────────────────────────────────────────────────────────────
+
+model QueueEntry {
+  id                    String           @id @default(cuid())
+  appointmentId         String           @unique
+  departmentId          String
+  staffProfileId        String?
+  tokenNumber           String
+  tokenDisplay          String           // e.g., "C-024"
+  priority              PriorityType     @default(REGULAR)
+  priorityScore         Int              @default(0) // higher = more priority
+  position              Int              @default(0)
+  status                QueueEntryStatus @default(WAITING)
+  notificationSent      Boolean          @default(false)
+  estimatedWaitMinutes  Float?
+  joinedAt              DateTime         @default(now())
+  calledAt              DateTime?
+  consultationStartedAt DateTime?
+  completedAt           DateTime?
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+
+  appointment   Appointment   @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  department    Department    @relation(fields: [departmentId], references: [id])
+  staffProfile  StaffProfile? @relation(fields: [staffProfileId], references: [id])
+  serviceRecord ServiceRecord?
+  predictionLogs PredictionLog[]
+
+  @@index([departmentId])
+  @@index([staffProfileId])
+  @@index([status])
+  @@index([joinedAt])
+}
+
+// ─── Service Record (for analytics & ML) ─────────────────────────────────────
+
+model ServiceRecord {
+  id                     String   @id @default(cuid())
+  queueEntryId           String   @unique
+  consultationStart      DateTime
+  consultationEnd        DateTime?
+  serviceDurationMinutes Float?
+  waitDurationMinutes    Float?
+  createdAt              DateTime @default(now())
+
+  queueEntry QueueEntry @relation(fields: [queueEntryId], references: [id], onDelete: Cascade)
+}
+
+// ─── OTP Verification ─────────────────────────────────────────────────────────
+
+model OtpVerification {
+  id          String   @id @default(cuid())
+  userId      String
+  phone       String
+  otpHash     String
+  expiresAt   DateTime
+  attempts    Int      @default(0)
+  maxAttempts Int      @default(5)
+  verified    Boolean  @default(false)
+  verifiedAt  DateTime?
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([phone])
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// ─── Notification ─────────────────────────────────────────────────────────────
+
+model Notification {
+  id            String           @id @default(cuid())
+  userId        String
+  appointmentId String?
+  type          NotificationType
+  title         String
+  message       String
+  isRead        Boolean          @default(false)
+  createdAt     DateTime         @default(now())
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointment Appointment? @relation(fields: [appointmentId], references: [id])
+
+  @@index([userId])
+  @@index([appointmentId])
+}
+
+// ─── Audit Log ───────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id          String      @id @default(cuid())
+  actorUserId String?
+  action      AuditAction
+  entityType  String?
+  entityId    String?
+  metadata    Json?
+  ipAddress   String?
+  timestamp   DateTime    @default(now())
+
+  actor User? @relation(fields: [actorUserId], references: [id])
+
+  @@index([actorUserId])
+  @@index([action])
+  @@index([timestamp])
+}
+
+// ─── Prediction Log (for ML monitoring) ──────────────────────────────────────
+
+model PredictionLog {
+  id                 String   @id @default(cuid())
+  queueEntryId       String
+  predictedWait      Float
+  actualWait         Float?
+  lowerBound         Float?
+  upperBound         Float?
+  modelVersion       String   @default("rule-based-v1")
+  featureSnapshot    Json?
+  createdAt          DateTime @default(now())
+
+  queueEntry QueueEntry @relation(fields: [queueEntryId], references: [id], onDelete: Cascade)
+
+  @@index([queueEntryId])
+}
