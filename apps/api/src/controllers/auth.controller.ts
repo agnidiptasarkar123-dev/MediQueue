@@ -7,27 +7,44 @@ import { config } from "../config/env";
 import { sendSuccess, sendError } from "../utils/response";
 import { AuthRequest } from "../middleware/auth.middleware";
 
+import { sendEmailOtp } from "../services/email.service";
+
 // POST /api/auth/send-otp
 export async function sendOtpHandler(req: Request, res: Response) {
   try {
-    const { phone } = req.body;
+    const { method, phone, email } = req.body;
 
-    if (!phone || typeof phone !== "string") {
-      return sendError(res, "INVALID_PHONE", "Mobile number is required", 400);
-    }
+    let normalizedPhone: string | null = null;
+    let normalizedEmail: string | null = null;
 
-    let normalizedPhone: string;
-    try {
-      normalizedPhone = normalizeIndianPhone(phone);
-    } catch {
-      return sendError(res, "INVALID_PHONE", "Invalid Indian mobile number. Enter a 10-digit number.", 400);
+    if (method === "email") {
+      if (!email || typeof email !== "string" || !email.includes("@")) {
+        return sendError(res, "INVALID_EMAIL", "Valid email address is required", 400);
+      }
+      normalizedEmail = email.toLowerCase().trim();
+    } else {
+      if (!phone || typeof phone !== "string") {
+        return sendError(res, "INVALID_PHONE", "Mobile number is required", 400);
+      }
+      try {
+        normalizedPhone = normalizeIndianPhone(phone);
+      } catch {
+        return sendError(res, "INVALID_PHONE", "Invalid Indian mobile number. Enter a 10-digit number.", 400);
+      }
     }
 
     // Find or create user
-    let user = await prisma.user.findUnique({ where: { phone: normalizedPhone } });
+    let user = await prisma.user.findFirst({
+      where: method === "email" ? { email: normalizedEmail } : { phone: normalizedPhone },
+    });
+
     if (!user) {
       user = await prisma.user.create({
-        data: { phone: normalizedPhone, role: "PATIENT" },
+        data: {
+          phone: normalizedPhone,
+          email: normalizedEmail,
+          role: "PATIENT",
+        },
       });
       await prisma.patient.create({
         data: { userId: user.id, fullName: "Patient" },
@@ -38,10 +55,11 @@ export async function sendOtpHandler(req: Request, res: Response) {
       return sendError(res, "ACCOUNT_DISABLED", "Your account has been disabled. Please contact support.", 403);
     }
 
-    const { otp, expiresAt } = await generateAndStoreOtp(user.id, normalizedPhone);
+    const { otp, expiresAt } = await generateAndStoreOtp(user.id, normalizedPhone || undefined, normalizedEmail || undefined);
 
-    // Simulation mode: log OTP to console (NEVER in production)
-    if (config.otp.mode === "SIMULATION") {
+    if (method === "email") {
+      await sendEmailOtp(normalizedEmail!, otp);
+    } else if (config.otp.mode === "SIMULATION") {
       console.log(`\n[SIMULATED OTP] Phone: ${normalizedPhone} | OTP: ${otp}\n`);
     }
 
@@ -49,10 +67,12 @@ export async function sendOtpHandler(req: Request, res: Response) {
       success: true,
       message: "OTP sent successfully",
       data: {
-        maskedPhone: maskPhone(phone),
+        maskedPhone: method === "email" ? normalizedEmail : maskPhone(phone),
         expiresAt,
         expiresInSeconds: config.otp.expiryMinutes * 60,
         resendCooldownSeconds: config.otp.resendCooldownSeconds,
+        // Send plain OTP for DEMO MODE only for phone
+        ...(method !== "email" && config.demoMode && config.isDev && { demoOtp: otp }),
       },
     });
   } catch (error) {
@@ -61,23 +81,35 @@ export async function sendOtpHandler(req: Request, res: Response) {
   }
 }
 
+
 // POST /api/auth/verify-otp
 export async function verifyOtpHandler(req: Request, res: Response) {
   try {
-    const { phone, otp } = req.body;
+    const { method, phone, email, otp } = req.body;
 
-    if (!phone || !otp) {
-      return sendError(res, "MISSING_FIELDS", "Phone number and OTP are required", 400);
+    if (!otp) {
+      return sendError(res, "MISSING_FIELDS", "OTP is required", 400);
     }
 
-    let normalizedPhone: string;
-    try {
-      normalizedPhone = normalizeIndianPhone(phone);
-    } catch {
-      return sendError(res, "INVALID_PHONE", "Invalid phone number", 400);
+    let normalizedPhone: string | null = null;
+    let normalizedEmail: string | null = null;
+
+    if (method === "email") {
+      if (!email) return sendError(res, "MISSING_FIELDS", "Email is required", 400);
+      normalizedEmail = email.toLowerCase().trim();
+    } else {
+      if (!phone) return sendError(res, "MISSING_FIELDS", "Phone is required", 400);
+      try {
+        normalizedPhone = normalizeIndianPhone(phone);
+      } catch {
+        return sendError(res, "INVALID_PHONE", "Invalid phone number", 400);
+      }
     }
 
-    const user = await prisma.user.findUnique({ where: { phone: normalizedPhone } });
+    const user = await prisma.user.findFirst({
+      where: method === "email" ? { email: normalizedEmail } : { phone: normalizedPhone },
+    });
+    
     if (!user) {
       return sendError(res, "USER_NOT_FOUND", "User not found. Please request an OTP first.", 404);
     }
@@ -99,6 +131,7 @@ export async function verifyOtpHandler(req: Request, res: Response) {
         user: {
           id: updatedUser!.id,
           phone: updatedUser!.phone,
+          email: updatedUser!.email,
           role: updatedUser!.role,
           isVerified: updatedUser!.isVerified,
           name: updatedUser!.patient?.fullName || updatedUser!.name,

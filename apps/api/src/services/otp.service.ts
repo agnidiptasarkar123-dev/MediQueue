@@ -10,7 +10,7 @@ function generateOtp(): string {
   return crypto.randomInt(100000, 1000000).toString();
 }
 
-export async function generateAndStoreOtp(userId: string, phone: string) {
+export async function generateAndStoreOtp(userId: string, phone?: string, email?: string) {
   // Check resend cooldown
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (user?.lastSentAt) {
@@ -35,7 +35,8 @@ export async function generateAndStoreOtp(userId: string, phone: string) {
   await prisma.otpVerification.create({
     data: {
       userId,
-      phone,
+      phone: phone || null,
+      email: email || null,
       otpHash,
       expiresAt,
       maxAttempts: config.otp.maxAttempts,

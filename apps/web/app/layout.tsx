@@ -9,19 +9,22 @@ export const metadata: Metadata = {
 };
 
 import { I18nProvider } from "@/lib/i18n";
+import { ThemeProvider } from "@/lib/theme";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
         {process.env.NEXT_PUBLIC_DEMO_MODE === "true" && (
           <div className="demo-banner">
             ⚠ Demo Environment — All patient data shown is synthetic and created for demonstration purposes only.
           </div>
         )}
-        <I18nProvider>
-          {children}
-        </I18nProvider>
+        <ThemeProvider>
+          <I18nProvider>
+            {children}
+          </I18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

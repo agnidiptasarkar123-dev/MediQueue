@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Activity, Bell, Clock, Plus, ChevronRight, LogOut, User, FileText } from "lucide-react";
 import { getMe, getPatientAppointments, getDepartments, getNotifications, logout } from "@/lib/api";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 export default function PatientDashboard() {
   const router = useRouter();
@@ -35,17 +37,18 @@ export default function PatientDashboard() {
   if (loading) return <DashboardSkeleton />;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       {/* Navbar */}
-      <nav className="sticky top-0 z-50 bg-white border-b border-slate-200">
+      <nav className="sticky top-0 z-50 bg-surface border-b border-border">
         <div className="page-container py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-primary rounded-xl flex items-center justify-center">
-              <Activity className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-bold text-slate-900">MediQueue</span>
+            <Link href="/" className="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-accent rounded-lg px-2 py-1">
+              <img src="/logo.svg" alt="MediQueue" className="h-8 dark:brightness-110" />
+            </Link>
           </div>
           <div className="flex items-center gap-2">
+            <ThemeSwitcher />
+            <LanguageSwitcher />
             <Link href="/patient/notifications" className="btn-icon relative">
               <Bell className="w-4.5 h-4.5" />
               {notifications.filter((n) => !n.isRead).length > 0 && (
@@ -64,10 +67,10 @@ export default function PatientDashboard() {
       <div className="page-container py-8">
         {/* Greeting */}
         <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-slate-900">
+          <h1 className="text-3xl font-extrabold text-text-main">
             {greeting}, {me?.patient?.fullName?.split(" ")[0] || "there"} 👋
           </h1>
-          <p className="text-slate-500 mt-1">Track your appointments and live queue status.</p>
+          <p className="text-muted mt-1">Track your appointments and live queue status.</p>
         </div>
 
         {/* Active appointment hero card */}
@@ -92,7 +95,7 @@ export default function PatientDashboard() {
             </div>
             <Link
               href={`/patient/queue?id=${activeAppointment.id}`}
-              className="block w-full text-center bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold py-3 rounded-2xl transition-colors mt-4"
+              className="block w-full text-center bg-surface/10 hover:bg-surface/20 text-white border border-white/20 font-semibold py-3 rounded-2xl transition-colors mt-4"
             >
               View Live Queue →
             </Link>
@@ -102,9 +105,9 @@ export default function PatientDashboard() {
         {/* Quick actions */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
-            { icon: "🏥", title: "Book Appointment", href: "/patient/dashboard/book", color: "bg-slate-50" },
+            { icon: "🏥", title: "Book Appointment", href: "/patient/dashboard/book", color: "bg-background" },
             { icon: "🎫", title: "Join Live Queue", href: "/patient/dashboard/join", color: "bg-green-50" },
-            { icon: "📋", title: "My Appointments", href: "/patient/appointments", color: "bg-slate-50" },
+            { icon: "📋", title: "My Appointments", href: "/patient/appointments", color: "bg-background" },
             { icon: "🔔", title: "Notifications", href: "/patient/notifications", color: "bg-amber-50" },
           ].map((action) => (
             <Link
@@ -113,7 +116,7 @@ export default function PatientDashboard() {
               className={`card p-5 flex flex-col items-center gap-2 text-center hover:shadow-md transition-shadow ${action.color}`}
             >
               <span className="text-3xl">{action.icon}</span>
-              <span className="text-sm font-semibold text-slate-700">{action.title}</span>
+              <span className="text-sm font-semibold text-text-main">{action.title}</span>
             </Link>
           ))}
         </div>
@@ -121,8 +124,8 @@ export default function PatientDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Departments */}
           <div className="lg:col-span-2 card p-0 overflow-hidden">
-            <div className="p-5 border-b border-slate-100 flex items-center justify-between">
-              <h2 className="font-semibold text-slate-900">Available Departments</h2>
+            <div className="p-5 border-b border-border/50 flex items-center justify-between">
+              <h2 className="font-semibold text-text-main">Available Departments</h2>
               <Link href="/patient/dashboard/join" className="text-sm text-primary font-medium hover:underline">View all</Link>
             </div>
             <div className="divide-y divide-slate-100">
@@ -130,11 +133,11 @@ export default function PatientDashboard() {
                 <Link
                   key={dept.id}
                   href={`/patient/dashboard/join?dept=${dept.id}`}
-                  className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors"
+                  className="flex items-center justify-between p-4 hover:bg-background transition-colors"
                 >
                   <div>
-                    <div className="font-semibold text-slate-800">{dept.name}</div>
-                    <div className="text-sm text-slate-500 mt-0.5">
+                    <div className="font-semibold text-text-main">{dept.name}</div>
+                    <div className="text-sm text-muted mt-0.5">
                       {dept.waitingCount} waiting · ~{dept.estimatedWaitMinutes} min
                     </div>
                   </div>
@@ -142,7 +145,7 @@ export default function PatientDashboard() {
                     <span className={`badge-${dept.waitingCount > 15 ? "red" : dept.waitingCount > 8 ? "amber" : "green"}`}>
                       {dept.waitingCount > 15 ? "Busy" : dept.waitingCount > 8 ? "Moderate" : "Available"}
                     </span>
-                    <ChevronRight className="w-4 h-4 text-slate-400" />
+                    <ChevronRight className="w-4 h-4 text-muted" />
                   </div>
                 </Link>
               ))}
@@ -151,18 +154,18 @@ export default function PatientDashboard() {
 
           {/* Recent notifications */}
           <div className="card p-0 overflow-hidden">
-            <div className="p-5 border-b border-slate-100 flex items-center justify-between">
-              <h2 className="font-semibold text-slate-900">Recent Alerts</h2>
+            <div className="p-5 border-b border-border/50 flex items-center justify-between">
+              <h2 className="font-semibold text-text-main">Recent Alerts</h2>
               <Link href="/patient/notifications" className="text-sm text-primary font-medium hover:underline">All</Link>
             </div>
             <div className="divide-y divide-slate-100">
               {notifications.length === 0 ? (
-                <div className="p-8 text-center text-slate-400 text-sm">No notifications yet</div>
+                <div className="p-8 text-center text-muted text-sm">No notifications yet</div>
               ) : notifications.map((n) => (
-                <div key={n.id} className={`p-4 ${!n.isRead ? "bg-slate-50" : ""}`}>
-                  <div className="font-semibold text-slate-800 text-sm">{n.title}</div>
-                  <div className="text-xs text-slate-500 mt-1 line-clamp-2">{n.message}</div>
-                  <div className="text-xs text-slate-400 mt-2">
+                <div key={n.id} className={`p-4 ${!n.isRead ? "bg-background" : ""}`}>
+                  <div className="font-semibold text-text-main text-sm">{n.title}</div>
+                  <div className="text-xs text-muted mt-1 line-clamp-2">{n.message}</div>
+                  <div className="text-xs text-muted mt-2">
                     {new Date(n.createdAt).toLocaleTimeString()}
                   </div>
                 </div>
@@ -174,20 +177,20 @@ export default function PatientDashboard() {
         {/* Recent appointments */}
         {appointments.length > 0 && (
           <div className="card p-0 overflow-hidden mt-6">
-            <div className="p-5 border-b border-slate-100 flex items-center justify-between">
-              <h2 className="font-semibold text-slate-900">Recent Appointments</h2>
+            <div className="p-5 border-b border-border/50 flex items-center justify-between">
+              <h2 className="font-semibold text-text-main">Recent Appointments</h2>
               <Link href="/patient/appointments" className="text-sm text-primary font-medium hover:underline">View all</Link>
             </div>
             <div className="divide-y divide-slate-100">
               {appointments.map((appt) => (
                 <div key={appt.id} className="flex items-center justify-between p-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center">
+                    <div className="w-10 h-10 bg-border/30 rounded-xl flex items-center justify-center">
                       <FileText className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <div className="font-semibold text-slate-800 text-sm">{appt.department.name}</div>
-                      <div className="text-xs text-slate-500">
+                      <div className="font-semibold text-text-main text-sm">{appt.department.name}</div>
+                      <div className="text-xs text-muted">
                         {new Date(appt.appointmentDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                         {appt.queueEntry && ` · Token: ${appt.queueEntry.tokenDisplay}`}
                       </div>
@@ -206,8 +209,8 @@ export default function PatientDashboard() {
 
 function DashboardSkeleton() {
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="h-16 bg-white border-b border-slate-200" />
+    <div className="min-h-screen bg-background">
+      <div className="h-16 bg-surface border-b border-border" />
       <div className="page-container py-8 space-y-6">
         <div className="skeleton h-10 w-64" />
         <div className="skeleton h-48 rounded-3xl" />

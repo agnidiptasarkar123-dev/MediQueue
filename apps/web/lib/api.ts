@@ -31,17 +31,19 @@ async function request<T>(
 
 // ── Auth ────────────────────────────────────────────────────────────────────
 
-export async function sendOtp(phone: string) {
-  return request<{ maskedPhone: string; expiresAt: string; expiresInSeconds: number; resendCooldownSeconds: number }>("/api/auth/send-otp", {
+export async function sendOtp(method: "phone" | "email", identifier: string) {
+  const body = method === "email" ? { method: "email", email: identifier } : { method: "phone", phone: identifier };
+  return request<{ maskedPhone: string; expiresAt: string; expiresInSeconds: number; resendCooldownSeconds: number; demoOtp?: string }>("/api/auth/send-otp", {
     method: "POST",
-    body: JSON.stringify({ phone }),
+    body: JSON.stringify(body),
   });
 }
 
-export async function verifyOtp(phone: string, otp: string) {
-  const res = await request<{ token: string; user: { id: string; phone: string; role: string; name: string; needsProfileSetup: boolean } }>("/api/auth/verify-otp", {
+export async function verifyOtp(method: "phone" | "email", identifier: string, otp: string) {
+  const body = method === "email" ? { method: "email", email: identifier, otp } : { method: "phone", phone: identifier, otp };
+  const res = await request<{ token: string; user: { id: string; phone: string; email: string; role: string; name: string; needsProfileSetup: boolean } }>("/api/auth/verify-otp", {
     method: "POST",
-    body: JSON.stringify({ phone, otp }),
+    body: JSON.stringify(body),
   });
 
   if (res.success && res.data?.token) {

@@ -1,9 +1,52 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
-  <!-- Brand Icon -->
-  <rect x="5" y="10" width="40" height="40" rx="12" fill="#2563eb" />
-  <path d="M25 15v30M10 30h30" stroke="#ffffff" stroke-width="4" stroke-linecap="round" />
-  <circle cx="25" cy="30" r="14" stroke="#ffffff" stroke-width="3" fill="none" />
-  
-  <!-- Brand Text -->
-  <text x="55" y="40" font-family="'Inter', -apple-system, sans-serif" font-weight="800" font-size="32" fill="#0f172a" letter-spacing="-0.5">MediQueue</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="70 40 360 340" width="100%" height="100%">
+  <defs>
+    <linearGradient id="crossGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0e52a5"/>
+      <stop offset="100%" stop-color="#05988e"/>
+    </linearGradient>
+    <linearGradient id="clockGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#14b8a6"/>
+    </linearGradient>
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0e52a5"/>
+      <stop offset="100%" stop-color="#05988e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Medical Cross Base -->
+  <g transform="translate(150, 50)">
+    <path d="M 60,0 H 140 V 60 H 200 V 140 H 140 V 200 H 60 V 140 H 0 V 60 H 60 Z" fill="url(#crossGradient)" rx="10" />
+  </g>
+
+  <!-- Clock Overlay -->
+  <g transform="translate(280, 50)">
+    <circle cx="50" cy="50" r="40" fill="url(#clockGradient)" stroke="#ffffff" stroke-width="8"/>
+    <path d="M 50,25 V 50 L 70,65" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- People Queue (Foreground) -->
+  <g transform="translate(140, 140)">
+    <!-- Person 3 (Back) -->
+    <g transform="translate(70, -20) scale(0.8)">
+      <circle cx="50" cy="30" r="25" fill="#0369a1" />
+      <path d="M 10,100 C 10,70 30,55 50,55 C 70,55 90,70 90,100" fill="#0369a1" />
+    </g>
+    <!-- Person 2 (Middle) -->
+    <g transform="translate(35, -10) scale(0.9)">
+      <circle cx="50" cy="30" r="25" fill="#0284c7" />
+      <path d="M 10,100 C 10,70 30,55 50,55 C 70,55 90,70 90,100" fill="#0284c7" />
+    </g>
+    <!-- Person 1 (Front) -->
+    <g transform="translate(0, 0)">
+      <circle cx="50" cy="30" r="25" fill="#0ea5e9" />
+      <path d="M 10,100 C 10,70 30,55 50,55 C 70,55 90,70 90,100" fill="#0ea5e9" />
+    </g>
+  </g>
+
+  <!-- Text -->
+  <g transform="translate(250, 320)" text-anchor="middle">
+    <text font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="70" fill="url(#textGradient)">MediQueue</text>
+    <text y="45" font-family="system-ui, -apple-system, sans-serif" font-weight="500" font-size="20" fill="#64748b" letter-spacing="1.5">Smart OPD Queue &amp; Appointment System</text>
+  </g>
 </svg>

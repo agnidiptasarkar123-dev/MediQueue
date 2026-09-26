@@ -1,214 +1,166 @@
-# MediQueue — Smart OPD Queue & Appointment System
+# MediQueue 🏥
 
-**CodeVoyage HT-01**
+**Smart OPD Queue & Appointment System**
+CodeVoyage HT-01
 
-> **MediQueue** turns hospital waiting into a predictable, real-time experience by connecting patients, doctors, staff and administrators through one intelligent OPD queue system.
-
----
-
-## 🎯 The Problem
-
-A hospital OPD normally has three disconnected problems:
-1. Patients don’t know when their turn will come and waste hours in crowded waiting rooms.
-2. Staff don’t have a real-time view of queues, prioritizing patients, and department load.
-3. Administrators cannot easily identify bottlenecks or optimize patient flow.
-
-## 💡 The Solution
-
-MediQueue connects all three stakeholders in real time:
-**Patient → Queue → Staff → Consultation → Analytics**
-
-The system provides:
-- Live appointment booking & walk-in kiosk support
-- Real-time queue joining with a secure digital token and QR Code
-- Estimated waiting times using dynamic heuristics
-- 3-turn-away push notifications
-- Seamless staff queue management (Call, Skip, No-Show, Complete)
-- Admin analytics and bottleneck detection dashboards
-- Full priority queue handling (Emergency, Pregnancy, Elderly)
+MediQueue transforms hospital waiting into a predictable, transparent, and seamless experience by connecting patients, doctors, staff, and administrators through one intelligent real-time OPD queue system.
 
 ---
 
-## 🚀 Target Users & Workflows
+## 🚀 Features
 
-### 📱 Patient Workflow
-1. Log in securely via mobile OTP.
-2. View nearby facilities and active departments.
-3. Book an appointment or join a live queue.
-4. Receive a token (e.g., C-011) and track position live.
-5. Get notified when 3 turns away.
+### Core Capabilities (M1 - M6)
+- **Live Queue Tracking:** Join queues remotely and track exact position in real-time.
+- **Explainable Wait Estimates:** See exactly *why* you are waiting, factoring in current queue size, average service time, and doctors on duty.
+- **Multi-Department Support:** Seamlessly manage distinct queues across different hospital departments (e.g., Cardiology, Orthopedics).
+- **Persistent Patient History:** Complete consultation histories mapped to individual patient profiles.
+- **Role-Based Access Control (RBAC):** Distinct dashboards and capabilities for Patients, Staff, and Administrators.
+- **Full Localization (22 Indian Languages):** Accessible immediately in 22 regional languages without requiring a page reload.
 
-### 👩‍⚕️ Staff/Doctor Workflow
-1. Log in to the clinical dashboard.
-2. View patients sorted dynamically by priority and arrival time.
-3. Call the next patient, skip if missing, or start/complete consultations.
+### Bonus Innovations (B1 - B3)
+- **B1: Advanced Wait Estimations:** Highly intelligent rule-based estimation tracking arrival rate, service rate, and queue size. *(Note: Machine learning predictive models are planned for future phases, current estimation is algorithmic).*
+- **B2: Kiosk Mode:** Dedicated, premium touch-first self-service terminal UI for walk-in patients.
+- **B3: Priority Processing:** Dynamic triage prioritizing elderly, pregnant, or emergency patients above regular walk-ins.
 
-### 📊 Admin Workflow
-1. Access comprehensive analytics dashboards.
-2. Monitor hospital-wide queue lengths, wait times, and department loads.
-3. Run "What-If" queue simulations and detect operational bottlenecks.
+### Admin & Intelligence Extras
+- **Bottleneck Detection:** Automated alerts for when arrival rates drastically exceed service rates.
+- **What-If Queue Simulation:** Interactive tool to model how adding or removing doctors affects average wait times.
+- **Real-Time Analytics:** Dashboards for queue performance and patient throughput.
+- **Audit Logging:** System-wide traceability for actions (joining, calling, skipping, completing).
+- **Privacy-By-Design:** Anonymous homepage preview preventing PII leakage without authentication.
 
-### 🖥️ Kiosk Workflow
-1. Walk-in patients enter their mobile number on a large, high-contrast touch interface.
-2. Select department and doctor.
-3. Receive queue token and wait-time estimate instantly without needing a smartphone app.
-
----
-
-## ⚙️ Features & Compliance (HT-01)
-
-### Mandatory Features
-- [x] **M1:** Mobile + OTP registration (Strict 10-digit validation + bcrypt).
-- [x] **M2:** Appointment/live queue + digital token + QR Code.
-- [x] **M3:** Live queue position + real-time estimated waiting time.
-- [x] **M4:** Staff/doctor actions (Call next, skip, no-show, complete).
-- [x] **M5:** Admin analytics (Queue length, avg wait, patient load).
-- [x] **M6:** Push notification at exactly 3 turns away.
-
-### Bonus Features
-- [x] **B1:** Wait-time estimation algorithm (Currently implemented as a robust rule-based model calculating active doctors, queue length, and historical averages).
-- [x] **B2:** Walk-in Touch Kiosk for offline/on-premise patients.
-- [x] **B3:** Advanced Priority handling (Elderly, Pregnancy, Emergencies bypass regular FIFO dynamically).
-
-### Additional Innovation
-- **Persistent Patient Accounts:** Same-mobile logins retrieve entire history and active queues.
-- **22 Indian Languages:** MediQueue supports 22 Indian languages: Assamese, Bengali, Bodo, Dogri, Gujarati, Hindi, Kannada, Kashmiri, Konkani, Maithili, Malayalam, Manipuri, Marathi, Nepali, Odia, Punjabi, Sanskrit, Santali, Sindhi, Tamil, Telugu and Urdu. Includes full UI translation, persisted language preference, and RTL support for Urdu.
-- **Accessibility & Keyboard Navigation:** Fully operable without a mouse.
-- **Premium Healthcare UI:** Polished, trustworthy design system built on Google Stitch principles.
-- **Privacy First:** QR codes encode opaque references, never plaintext PHI (Protected Health Information).
+### Enterprise Features
+- **Authentication System:** Robust JWT-based authentication.
+- **OTP Verification:** Highly secure OTP flows using cryptographically secure randomization.
+- **Email Delivery:** Direct Email OTP fallback delivery using SMTP logic.
+- **Design System:** Premium dark/light themes, keyboard accessibility, mobile-responsive screens.
 
 ---
 
-## 🏗️ Architecture
+## 🏗 Technology Stack & Architecture
 
-```text
-                           Browser (Next.js)
-                                │
-               ┌────────────────┼────────────────┐
-               │                │                │
-         Patient App       Staff Panel    Admin Dashboard & Kiosk
-               │                │                │
-               └────────────────┼────────────────┘
-                                │ (REST & Socket.IO)
-                                ▼
-                     Node.js + Express + TypeScript
-                                │
-        ┌──────────────┬────────┴────────┬──────────────┐
-        │              │                 │              │
- Authentication   Queue Engine     Notifications    Admin Analytics
-        │              │                 │              │
-        └──────────────┴────────┬────────┴──────────────┘
-                                ▼
-                              Prisma
-                                ▼
-                            PostgreSQL
-```
+- **Frontend:** Next.js 15, React, TypeScript, Tailwind CSS v4, Lucide React, Recharts.
+- **Backend:** Node.js, Express, TypeScript, Socket.IO.
+- **Database:** PostgreSQL (Core Storage), Prisma ORM.
+- **Translation Engine:** Pre-generated local JSON dictionaries powered offline (Gemini used purely as a generator, not a runtime dependency).
 
-### Technology Stack
-- **Frontend:** Next.js 15, React, TypeScript, Tailwind CSS v4, Recharts, Lucide Icons
-- **Backend:** Node.js, Express, TypeScript, Zod, Socket.IO, bcrypt
-- **Database:** PostgreSQL, Prisma ORM
-- **Testing:** Autonomous Playwright/Chrome-based E2E, Unit Tests
+### System Architecture
+MediQueue utilizes a separated client-server architecture:
+- `apps/web`: The Next.js frontend serving all roles.
+- `apps/api`: The Express backend managing API requests and real-time Socket.IO broadcasts for queue state mutations.
 
 ---
 
-## 🛠️ Quick Start & Setup
+## 🛠 Installation & Setup
 
 ### Prerequisites
-- Node.js (v20+)
-- PostgreSQL (v14+) running locally or via Docker
-- Git
+- Node.js (v18+)
+- PostgreSQL (v14+)
+- npm or yarn
 
-### 1. Clone & Install
+### 1. Database Setup
+Create a PostgreSQL database for the project:
 ```bash
-git clone https://github.com/your-org/mediqueue.git
-cd mediqueue
-npm install
+createdb queuecare
 ```
 
 ### 2. Environment Variables
-Copy the example environment files for both apps:
-```bash
-cp apps/api/.env.example apps/api/.env
-cp apps/web/.env.example apps/web/.env.local
+Create `.env` in `apps/api/`:
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/queuecare"
+JWT_SECRET="your-super-secret-32-character-key"
+JWT_EXPIRES_IN="7d"
+OTP_MODE="SIMULATION"
+OTP_EXPIRY_MINUTES=5
+OTP_MAX_ATTEMPTS=5
+OTP_RESEND_COOLDOWN_SECONDS=30
+NODE_ENV="development"
+DEMO_MODE="true"
+PORT=5001
+FRONTEND_URL="http://localhost:3000"
 ```
-Ensure your `DATABASE_URL` in `apps/api/.env` points to a valid PostgreSQL instance.
 
-### 3. Database Migration & Seed
+Create `.env.local` in `apps/web/`:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5001
+NEXT_PUBLIC_SOCKET_URL=http://localhost:5001
+NEXT_PUBLIC_DEMO_MODE=true
+GEMINI_API_KEY=
+```
+
+### 3. Install Dependencies
+Run from the repository root:
+```bash
+cd apps/api && npm install
+cd ../web && npm install
+```
+
+### 4. Database Migration & Seeding
+Populate the database with synthetic testing data (departments, doctors, admin, patients).
 ```bash
 cd apps/api
 npx prisma generate
-npx prisma migrate dev --name init
-npm run db:seed
+npx prisma db push
+npx prisma db seed
 ```
-*Note: The seed script injects 3 departments, 6 doctors, and 45+ synthetic patients into active queues to ensure the demo is populated.*
 
-### 4. Start Development Servers
+### 5. Running the Application
+Start the backend API server (runs on Port **5001**):
 ```bash
-# Terminal 1 — Backend API
 cd apps/api
 npm run dev
+```
+Health Check: `http://localhost:5001/health`
 
-# Terminal 2 — Frontend App
+Start the frontend application (runs on Port **3000**):
+```bash
 cd apps/web
 npm run dev
 ```
 
-### 5. Access the Platform
-- **Patient Interface:** `http://localhost:3000`
-- **Staff Dashboard:** `http://localhost:3000/staff`
-- **Admin Analytics:** `http://localhost:3000/admin`
-- **Kiosk Mode:** `http://localhost:3000/kiosk`
-- **API Health:** `http://localhost:5001/health`
+---
+
+## 🔑 Demo Credentials
+
+To test the application, the seed script generates the following test accounts:
+- **Admin:** `+919999999999`
+- **Staff (Doctor):** `+918800000001` (Check seed file for others)
+- **Patient Demo:** Use any valid 10-digit Indian mobile number (e.g., `9876543210`).
+
+*When `DEMO_MODE=true` is enabled, the OTP will be displayed directly in the UI for seamless testing.*
 
 ---
 
-## 🎭 Demo Credentials
+## 📊 API & Socket Events Reference
 
-> ⚠ **Note:** All data is synthetic and created exclusively for demo purposes. OTPs in the demo environment are randomly generated but visible in the UI prompt for testing convenience.
+**REST APIs:**
+- `POST /api/auth/send-otp` - Dispatch OTP.
+- `POST /api/auth/verify-otp` - Authenticate.
+- `GET /api/staff/queue` - Retrieve department active queue.
+- `POST /api/staff/queue/:id/call` - Advance queue state.
+- `GET /api/admin/overview` - Fetch admin performance metrics.
+- `POST /api/admin/simulate` - Run what-if simulations.
 
-**Demo Patient:**
-- Phone: `+91 9911223344`
-
-**Demo Staff (Doctor):**
-- Phone: `+91 8800000001` (Dr. Ananya Sen)
-
-**Demo Admin:**
-- Phone: `+91 9999999999`
-
----
-
-## 📡 API & Socket.IO Reference
-
-### Core API Endpoints
-| Method | Endpoint | Auth Required | Role | Description |
-|--------|----------|---------------|------|-------------|
-| POST | `/api/auth/send-otp` | No | Any | Generates and hashes 6-digit OTP |
-| POST | `/api/auth/verify-otp` | No | Any | Validates OTP and returns JWT |
-| POST | `/api/queue/join` | Yes | PATIENT | Joins live queue & returns Token |
-| PUT | `/api/staff/queue/:id/status` | Yes | STAFF | Updates status (Call, Skip, etc.) |
-| GET | `/api/admin/stats` | Yes | ADMIN | Fetches bottleneck & load stats |
-
-### Core Socket Events
-| Event | Direction | Scope | Description |
-|-------|-----------|-------|-------------|
-| `queue:updated` | Server → Client | Dept | Broadcasts queue metric changes |
-| `patient:three-away`| Server → Client | User | Push notification sent to specific token |
-| `patient:called` | Server → Client | User | Alerts patient to proceed to room |
+**Socket.IO Events (Real-time updates):**
+- `queue_updated` - Emitted to department rooms when a patient status changes.
+- `queue_joined` - Emitted when a new patient enters the queue.
 
 ---
 
-## 🧪 Testing
-See [docs/TEST_REPORT.md](docs/TEST_REPORT.md) for full execution results. We maintain tests across Unit, E2E, Auth, RBAC, Queue state logic, and UI accessibility.
+## 🧪 Testing & Validation
+
+Run comprehensive TypeScript checks to ensure structural integrity:
+```bash
+cd apps/api && npx tsc --noEmit && npx prisma validate
+cd ../web && npx tsc --noEmit && npm run build
+```
 
 ---
 
-## 🔒 Security & Privacy
-- **JWT & Role-Based Access (RBAC):** Rigid API checks prevent Patients from triggering Staff actions.
-- **OTP Hardening:** Never returned in production HTTP payloads; strictly hashed with bcrypt.
-- **Privacy-by-Design QR:** Encodes only opaque UUIDs, never plaintext medical or personal history.
+## 🔮 Future Scope
+- Transition rule-based wait-time estimates to historical-data trained ML predictive models.
+- Enhanced analytics pipelines.
+- Multi-facility geo-fencing for walk-in validations.
 
 ---
-
-## 📝 License
-Proprietary / Closed Source for CodeVoyage Hackathon Submission. All synthetic names and scenarios are purely illustrative.
+*Built for CodeVoyage HT-01. All rights reserved.*

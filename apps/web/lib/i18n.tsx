@@ -1,6 +1,6 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
-
+import enMessages from "../messages/en.json";
 type Locale = string;
 type Messages = Record<string, string>;
 
@@ -45,7 +45,8 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   };
 
   const t = (key: string, variables?: Record<string, string | number>): string => {
-    let str = messages[key] || key;
+    // Look up in current locale, fall back to English, fall back to key
+    let str = messages[key] || (enMessages as Record<string, string>)[key] || key;
     if (variables) {
       Object.keys(variables).forEach((v) => {
         str = str.replace(`{{${v}}}`, String(variables[v]));

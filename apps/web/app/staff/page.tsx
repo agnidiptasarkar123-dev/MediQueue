@@ -99,18 +99,18 @@ export default function StaffPage() {
   if (loading) return <StaffSkeleton />;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <nav className="sticky top-0 z-50 bg-white border-b border-slate-200">
+      <nav className="sticky top-0 z-50 bg-surface border-b border-border">
         <div className="page-container py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center">
               <Activity className="w-4 h-4 text-white" />
             </div>
             <div>
-              <div className="font-bold text-slate-900">MediQueue</div>
+              <div className="font-bold text-text-main">MediQueue</div>
               {staffProfile && (
-                <div className="text-xs text-slate-500 flex items-center gap-1">
+                <div className="text-xs text-muted flex items-center gap-1">
                   <div className="live-dot">LIVE</div>
                   · {staffProfile.fullName} · {staffProfile.roomNumber}
                 </div>
@@ -126,7 +126,7 @@ export default function StaffPage() {
 
       <div className="page-container py-6">
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4 flex items-center justify-between">
+          <div className="bg-danger/10 border border-red-200 rounded-xl p-4 mb-4 flex items-center justify-between">
             <span className="text-red-700 text-sm">{error}</span>
             <button onClick={() => setError("")}><X className="w-4 h-4 text-red-500" /></button>
           </div>
@@ -136,18 +136,18 @@ export default function StaffPage() {
         {stats && (
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
             {[
-              { label: "Waiting", value: stats.waiting, icon: <Users className="w-5 h-5 text-primary" />, color: "bg-slate-50" },
+              { label: "Waiting", value: stats.waiting, icon: <Users className="w-5 h-5 text-primary" />, color: "bg-background" },
               { label: "Called", value: stats.called, icon: <Bell className="w-5 h-5 text-amber-600" />, color: "bg-amber-50" },
               { label: "In Consultation", value: stats.inConsultation, icon: <Activity className="w-5 h-5 text-success" />, color: "bg-green-50" },
-              { label: "Completed Today", value: stats.completedToday, icon: <CheckCircle className="w-5 h-5 text-slate-600" />, color: "bg-slate-50" },
-              { label: "Avg Service", value: `${stats.avgServiceMinutes.toFixed(1)}m`, icon: <Clock className="w-5 h-5 text-slate-600" />, color: "bg-slate-50" },
+              { label: "Completed Today", value: stats.completedToday, icon: <CheckCircle className="w-5 h-5 text-muted" />, color: "bg-background" },
+              { label: "Avg Service", value: `${stats.avgServiceMinutes.toFixed(1)}m`, icon: <Clock className="w-5 h-5 text-muted" />, color: "bg-background" },
             ].map((s) => (
               <div key={s.label} className={`card p-4 ${s.color}`}>
                 <div className="flex items-center justify-between mb-2">
                   {s.icon}
-                  <span className="text-2xl font-extrabold text-slate-800">{s.value}</span>
+                  <span className="text-2xl font-extrabold text-text-main">{s.value}</span>
                 </div>
-                <div className="text-xs text-slate-500 font-medium">{s.label}</div>
+                <div className="text-xs text-muted font-medium">{s.label}</div>
               </div>
             ))}
           </div>
@@ -157,7 +157,7 @@ export default function StaffPage() {
           {/* ── Current Patient Card ──────────────────────────────────────── */}
           <div className="lg:col-span-1">
             <div className="card p-6">
-              <h2 className="font-bold text-slate-900 mb-4">
+              <h2 className="font-bold text-text-main mb-4">
                 {currentPatient ? "Now Serving" : nextPatient ? "Next Patient" : "Queue Empty"}
               </h2>
 
@@ -165,7 +165,7 @@ export default function StaffPage() {
                 <div className="animate-fade-in">
                   <div className="text-center mb-6">
                     <div className="token-display mb-1">{currentPatient.tokenDisplay}</div>
-                    <div className="font-semibold text-slate-700 text-lg">{currentPatient.appointment.patient.fullName}</div>
+                    <div className="font-semibold text-text-main text-lg">{currentPatient.appointment.patient.fullName}</div>
                     <div className="flex items-center justify-center gap-2 mt-2">
                       <span className={`status-${currentPatient.status}`}>{currentPatient.status.replace(/_/g, " ")}</span>
                       <span className={`priority-${currentPatient.priority} text-xs`}>{currentPatient.priority}</span>
@@ -209,9 +209,9 @@ export default function StaffPage() {
 
               {!currentPatient && nextPatient && (
                 <div className="animate-fade-in text-center">
-                  <div className="text-slate-400 mb-4 text-sm">Ready for next patient</div>
+                  <div className="text-muted mb-4 text-sm">Ready for next patient</div>
                   <div className="token-display text-primary mb-2">{nextPatient.tokenDisplay}</div>
-                  <div className="font-semibold text-slate-700 mb-4">{nextPatient.appointment.patient.fullName}</div>
+                  <div className="font-semibold text-text-main mb-4">{nextPatient.appointment.patient.fullName}</div>
                   <button
                     className="btn-primary w-full py-3.5"
                     onClick={() => handleAction("call", nextPatient.id)}
@@ -224,7 +224,7 @@ export default function StaffPage() {
               )}
 
               {!currentPatient && !nextPatient && (
-                <div className="text-center py-8 text-slate-400">
+                <div className="text-center py-8 text-muted">
                   <CheckCircle className="w-12 h-12 mx-auto mb-3 text-green-300" />
                   <div className="font-semibold">Queue is empty</div>
                   <div className="text-sm mt-1">No patients waiting</div>
@@ -235,9 +235,9 @@ export default function StaffPage() {
 
           {/* ── Queue Table ───────────────────────────────────────────────── */}
           <div className="lg:col-span-2 card overflow-hidden">
-            <div className="p-5 border-b border-slate-100">
-              <h2 className="font-bold text-slate-900">Patient Queue</h2>
-              <p className="text-sm text-slate-500 mt-1">{waitingQueue.length} waiting · {stats?.called || 0} called</p>
+            <div className="p-5 border-b border-border/50">
+              <h2 className="font-bold text-text-main">Patient Queue</h2>
+              <p className="text-sm text-muted mt-1">{waitingQueue.length} waiting · {stats?.called || 0} called</p>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -253,18 +253,18 @@ export default function StaffPage() {
                 </thead>
                 <tbody>
                   {queue.length === 0 ? (
-                    <tr><td colSpan={6} className="px-4 py-12 text-center text-slate-400 text-sm">No patients in queue</td></tr>
+                    <tr><td colSpan={6} className="px-4 py-12 text-center text-muted text-sm">No patients in queue</td></tr>
                   ) : queue.map((entry) => (
                     <tr key={entry.id} className="table-row">
                       <td><span className="font-mono font-bold text-primary">{entry.tokenDisplay}</span></td>
                       <td>
-                        <div className="font-medium text-slate-800">{entry.appointment.patient.fullName}</div>
-                        <div className="text-xs text-slate-500 flex items-center gap-1">
+                        <div className="font-medium text-text-main">{entry.appointment.patient.fullName}</div>
+                        <div className="text-xs text-muted flex items-center gap-1">
                           <Phone className="w-3 h-3" />{entry.appointment.patient.user.phone.replace("+91", "")}
                         </div>
                       </td>
                       <td><span className={`priority-${entry.priority}`}>{entry.priority}</span></td>
-                      <td className="text-slate-500 text-sm">{entry.estimatedWaitMinutes}m</td>
+                      <td className="text-muted text-sm">{entry.estimatedWaitMinutes}m</td>
                       <td><span className={`status-${entry.status}`}>{entry.status.replace(/_/g, " ")}</span></td>
                       <td>
                         <div className="flex items-center gap-1">
@@ -320,8 +320,8 @@ export default function StaffPage() {
       {showSkipModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="card p-6 w-full max-w-sm animate-fade-in-up">
-            <h3 className="font-bold text-slate-900 mb-4">Skip Patient</h3>
-            <p className="text-sm text-slate-500 mb-4">Optionally provide a reason for skipping.</p>
+            <h3 className="font-bold text-text-main mb-4">Skip Patient</h3>
+            <p className="text-sm text-muted mb-4">Optionally provide a reason for skipping.</p>
             <input
               className="input mb-4"
               placeholder="Reason (optional)"
@@ -343,8 +343,8 @@ export default function StaffPage() {
 
 function StaffSkeleton() {
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="h-16 bg-white border-b border-slate-200" />
+    <div className="min-h-screen bg-background">
+      <div className="h-16 bg-surface border-b border-border" />
       <div className="page-container py-6 space-y-6">
         <div className="grid grid-cols-5 gap-4">{[...Array(5)].map((_, i) => <div key={i} className="skeleton h-20 rounded-2xl" />)}</div>
         <div className="grid grid-cols-3 gap-6">

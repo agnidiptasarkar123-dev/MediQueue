@@ -60,16 +60,16 @@ function JoinQueueContent() {
   const filteredDepts = departments.filter((d) => d.name.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
+      <div className="bg-surface border-b border-border sticky top-0 z-10">
         <div className="page-container py-4 flex items-center gap-4">
           <button onClick={() => step === "department" ? router.back() : setStep(step === "doctor" ? "department" : "doctor")} className="btn-icon">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="font-bold text-slate-900">Join Live Queue</h1>
-            <p className="text-xs text-slate-500">
+            <h1 className="font-bold text-text-main">Join Live Queue</h1>
+            <p className="text-xs text-muted">
               {step === "department" ? "Select department" : step === "doctor" ? `${selectedDept?.name} · Select doctor` : "Confirm & join"}
             </p>
           </div>
@@ -79,7 +79,7 @@ function JoinQueueContent() {
           {["department", "doctor", "confirm"].map((s, i) => (
             <div
               key={s}
-              className={`flex-1 h-1 ${["department", "doctor", "confirm", "success"].indexOf(step) > i ? "bg-blue-600" : "bg-slate-200"} transition-all duration-300`}
+              className={`flex-1 h-1 ${["department", "doctor", "confirm", "success"].indexOf(step) > i ? "bg-blue-600" : "bg-border/60"} transition-all duration-300`}
             />
           ))}
         </div>
@@ -109,8 +109,8 @@ function JoinQueueContent() {
                     onClick={() => { setSelectedDept({ id: dept.id, name: dept.name }); setStep("doctor"); }}
                   >
                     <div>
-                      <div className="font-semibold text-slate-900">{dept.name}</div>
-                      <div className="flex items-center gap-4 mt-2 text-sm text-slate-500">
+                      <div className="font-semibold text-text-main">{dept.name}</div>
+                      <div className="flex items-center gap-4 mt-2 text-sm text-muted">
                         <span className="flex items-center gap-1">
                           <Users className="w-3.5 h-3.5" /> {dept.waitingCount} waiting
                         </span>
@@ -136,7 +136,7 @@ function JoinQueueContent() {
         {step === "doctor" && selectedDept && (
           <div className="animate-fade-in-up space-y-3">
             <button
-              className="w-full card p-5 border-2 border-dashed border-slate-300 hover:border-blue-400 hover:bg-blue-50/50 transition-all text-slate-500 hover:text-blue-600 text-sm font-medium"
+              className="w-full card p-5 border-2 border-dashed border-slate-300 hover:border-blue-400 hover:bg-accent/10/50 transition-all text-muted hover:text-accent text-sm font-medium"
               onClick={() => { setSelectedDoctor(null); setStep("confirm"); }}
             >
               Any available doctor
@@ -148,9 +148,9 @@ function JoinQueueContent() {
                 onClick={() => { setSelectedDoctor({ id: doc.id, name: doc.name, roomNumber: doc.roomNumber }); setStep("confirm"); }}
               >
                 <div>
-                  <div className="font-bold text-slate-900">{doc.name}</div>
-                  <div className="text-sm text-slate-500 mt-0.5">{doc.specialization}</div>
-                  <div className="flex items-center gap-4 mt-3 text-sm text-slate-500">
+                  <div className="font-bold text-text-main">{doc.name}</div>
+                  <div className="text-sm text-muted mt-0.5">{doc.specialization}</div>
+                  <div className="flex items-center gap-4 mt-3 text-sm text-muted">
                     <span className="flex items-center gap-1">
                       <MapPin className="w-3.5 h-3.5" /> {doc.roomNumber}
                     </span>
@@ -171,28 +171,28 @@ function JoinQueueContent() {
         {/* ── Step 3: Confirm ─────────────────────────────────────────────── */}
         {step === "confirm" && selectedDept && (
           <div className="card p-6 animate-fade-in-up">
-            <h2 className="font-bold text-slate-900 mb-6">Confirm Queue Entry</h2>
+            <h2 className="font-bold text-text-main mb-6">Confirm Queue Entry</h2>
             <div className="space-y-4 mb-6">
               <div className="flex justify-between text-sm">
-                <span className="text-slate-500">Department</span>
-                <span className="font-semibold text-slate-800">{selectedDept.name}</span>
+                <span className="text-muted">Department</span>
+                <span className="font-semibold text-text-main">{selectedDept.name}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-slate-500">Doctor</span>
-                <span className="font-semibold text-slate-800">{selectedDoctor?.name || "Any available"}</span>
+                <span className="text-muted">Doctor</span>
+                <span className="font-semibold text-text-main">{selectedDoctor?.name || "Any available"}</span>
               </div>
               {selectedDoctor?.roomNumber && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-slate-500">Room</span>
-                  <span className="font-semibold text-slate-800">{selectedDoctor.roomNumber}</span>
+                  <span className="text-muted">Room</span>
+                  <span className="font-semibold text-text-main">{selectedDoctor.roomNumber}</span>
                 </div>
               )}
               <div className="flex justify-between text-sm">
-                <span className="text-slate-500">Queue type</span>
-                <span className="font-semibold text-slate-800">Live Queue</span>
+                <span className="text-muted">Queue type</span>
+                <span className="font-semibold text-text-main">Live Queue</span>
               </div>
             </div>
-            {error && <div className="text-sm text-red-600 bg-red-50 rounded-xl p-3 mb-4">{error}</div>}
+            {error && <div className="text-sm text-danger bg-danger/10 rounded-xl p-3 mb-4">{error}</div>}
             <button className="btn-primary w-full py-3.5" onClick={handleJoin} disabled={joining}>
               {joining ? "Joining queue..." : "Confirm & Join Queue"}
             </button>
@@ -204,19 +204,19 @@ function JoinQueueContent() {
           <div className="animate-fade-in-up space-y-4">
             <div className="card p-8 text-center">
               <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-8 h-8 text-green-600" />
+                <CheckCircle className="w-8 h-8 text-success" />
               </div>
-              <div className="text-green-600 font-semibold mb-2">You're in the queue!</div>
-              <div className="text-xs text-slate-500 font-medium uppercase tracking-wide mb-2">{selectedDept?.name}</div>
+              <div className="text-success font-semibold mb-2">You're in the queue!</div>
+              <div className="text-xs text-muted font-medium uppercase tracking-wide mb-2">{selectedDept?.name}</div>
               <div className="token-display mb-4">{result.tokenDisplay}</div>
               <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-slate-50 rounded-xl p-4">
-                  <div className="text-2xl font-bold text-slate-800">{result.patientsAhead}</div>
-                  <div className="text-xs text-slate-500 mt-1">Patients ahead</div>
+                <div className="bg-background rounded-xl p-4">
+                  <div className="text-2xl font-bold text-text-main">{result.patientsAhead}</div>
+                  <div className="text-xs text-muted mt-1">Patients ahead</div>
                 </div>
-                <div className="bg-blue-50 rounded-xl p-4">
-                  <div className="text-2xl font-bold text-blue-600">~{result.estimatedWaitMinutes}m</div>
-                  <div className="text-xs text-slate-500 mt-1">Estimated wait</div>
+                <div className="bg-accent/10 rounded-xl p-4">
+                  <div className="text-2xl font-bold text-accent">~{result.estimatedWaitMinutes}m</div>
+                  <div className="text-xs text-muted mt-1">Estimated wait</div>
                 </div>
               </div>
               {result.qrCodeDataUrl && (
@@ -242,7 +242,7 @@ function JoinQueueContent() {
 
 export default function JoinQueuePage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-50 flex items-center justify-center text-slate-500">Loading...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center text-muted">Loading...</div>}>
       <JoinQueueContent />
     </Suspense>
   );
