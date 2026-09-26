@@ -123,7 +123,7 @@ npm run dev
 ## 🔑 Demo Credentials
 
 To test the application, the seed script generates the following test accounts:
-- **Admin:** `+919999999999`
+- **Admin:** `+919988776611`
 - **Staff (Doctor):** `+918800000001` (Check seed file for others)
 - **Patient Demo:** Use any valid 10-digit Indian mobile number (e.g., `9876543210`).
 

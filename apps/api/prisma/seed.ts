@@ -85,14 +85,14 @@ async function main() {
   console.log("Creating admin account...");
   const adminUser = await prisma.user.create({
     data: {
-      phone: "+919999999999",
+      phone: "+919988776611",
       role: "ADMIN",
       name: "Admin",
       isVerified: true,
       isActive: true,
     },
   });
-  console.log(`✓ Admin: +91 9999999999\n`);
+  console.log(`✓ Admin: +91 9988776611\n`);
 
   // ── Create Doctors ─────────────────────────────────────────────────────────
   console.log("Creating doctors...");
@@ -302,7 +302,7 @@ async function main() {
   console.log("  Departments: 3 (Cardiology, Gen. Medicine, Orthopedics)");
   console.log("  Doctors: 6");
   console.log("  Patients: 45 synthetic + 1 demo patient");
-  console.log("  Admin: +91 9999999999");
+  console.log("  Admin: +91 9988776611");
   console.log("  Demo patient: +91 9911223344 | OTP: 123456");
   console.log("═══════════════════════════════════════");
   console.log("\n⚠  DEMO ENVIRONMENT: All data is synthetic.");
